@@ -1,0 +1,826 @@
+<title>Desafio Atleta Híbrido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '430105363143241');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=430105363143241&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<style>
+  :root{
+    --bg:#F6F8F2;
+    --surface:#FFFFFF;
+    --surface-2:#EFF4EA;
+    --text:#122018;
+    --text-muted:#5B6B60;
+    --primary:#1E9E52;
+    --primary-dark:#0F7A3D;
+    --primary-soft:#E3F5E9;
+    --accent:#FF6A3D;
+    --accent-soft:#FFE7DC;
+    --danger:#E14F45;
+    --danger-soft:#FBE4E2;
+    --border:#DCE6DA;
+    --shadow: 0 1px 2px rgba(18,32,24,.04), 0 8px 24px -12px rgba(18,32,24,.18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0D1610;
+      --surface:#152019;
+      --surface-2:#1B291F;
+      --text:#ECF4EE;
+      --text-muted:#9FB3A6;
+      --primary:#37D97C;
+      --primary-dark:#1F9E56;
+      --primary-soft:rgba(55,217,124,.14);
+      --accent:#FF8A5C;
+      --accent-soft:rgba(255,138,92,.14);
+      --danger:#FF6B61;
+      --danger-soft:rgba(255,107,97,.14);
+      --border:#243830;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D1610;
+    --surface:#152019;
+    --surface-2:#1B291F;
+    --text:#ECF4EE;
+    --text-muted:#9FB3A6;
+    --primary:#37D97C;
+    --primary-dark:#1F9E56;
+    --primary-soft:rgba(55,217,124,.14);
+    --accent:#FF8A5C;
+    --accent-soft:rgba(255,138,92,.14);
+    --danger:#FF6B61;
+    --danger-soft:rgba(255,107,97,.14);
+    --border:#243830;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    min-height:100%;
+  }
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .display{
+    font-family:'Bebas Neue',Impact,'Plus Jakarta Sans',sans-serif;
+    letter-spacing:.01em;
+    line-height:1.02;
+  }
+  .mono{ font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+
+  /* topbar */
+  .topbar{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:20;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(8px);
+    padding:14px 18px 10px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .back-btn{
+    width:34px;height:34px;border-radius:999px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex:none;
+  }
+  .back-btn[hidden]{visibility:hidden}
+  .progress-track{
+    flex:1;height:8px;border-radius:999px;background:var(--surface-2);
+    overflow:hidden;border:1px solid var(--border);
+  }
+  .progress-fill{
+    height:100%;border-radius:999px;
+    background:linear-gradient(90deg,var(--primary-dark),var(--primary));
+    width:0%;
+    transition:width .45s cubic-bezier(.4,0,.2,1);
+  }
+  .step-count{ font-size:12px; color:var(--text-muted); flex:none; min-width:34px; text-align:right;}
+
+  main{ flex:1; padding:6px 20px 40px; }
+  .step{ animation:rise .38s cubic-bezier(.2,.7,.2,1); }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none} }
+  @media (prefers-reduced-motion: reduce){ .step{animation:none} }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--primary-dark); background:var(--primary-soft);
+    padding:5px 10px; border-radius:999px; margin-bottom:14px;
+  }
+  :root:not([data-theme="light"]) .eyebrow, :root[data-theme="dark"] .eyebrow{ color:var(--primary) }
+  h1.q{
+    font-family:'Bebas Neue',Impact,sans-serif;
+    font-size:34px; letter-spacing:.01em; margin:0 0 8px; text-wrap:balance;
+  }
+  p.sub{ margin:0 0 22px; color:var(--text-muted); font-size:15.5px; line-height:1.5; max-width:46ch;}
+
+  /* options */
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .opt{
+    display:flex; align-items:center; gap:14px;
+    width:100%; text-align:left;
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:16px; padding:14px 16px;
+    cursor:pointer; font:inherit; color:var(--text);
+    transition:border-color .15s, background .15s, transform .1s;
+    box-shadow:var(--shadow);
+  }
+  .opt:hover{ border-color:var(--primary); }
+  .opt:active{ transform:scale(.98); }
+  .opt.selected{ border-color:var(--primary); background:var(--primary-soft); }
+  .opt-icon{
+    width:42px;height:42px;border-radius:12px;flex:none;
+    background:var(--surface-2); display:flex;align-items:center;justify-content:center;
+    font-size:20px; overflow:hidden;
+  }
+  .opt-icon.num{ font-family:'Bebas Neue',sans-serif; font-size:20px; background:var(--primary); color:#fff; }
+  .opt-icon img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .opt-text{ flex:1; min-width:0; }
+  .opt-label{ display:block; font-weight:700; font-size:15.5px; }
+  .opt-sub{ display:block; font-size:13px; color:var(--text-muted); margin-top:2px; }
+  .opt-chev{ flex:none; color:var(--text-muted); }
+
+  .sexo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .sexo-card{ background:var(--surface); border:1.5px solid var(--border); border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow); transition:border-color .15s, transform .1s; padding:0; font:inherit; color:var(--text); text-align:center; }
+  .sexo-card:active{ transform:scale(.98); }
+  .sexo-card.selected{ border-color:var(--primary); }
+  .sexo-card img{ display:block; width:100%; aspect-ratio:1/1; object-fit:cover; }
+  .sexo-card .lbl{ padding:12px; font-weight:800; font-size:15.5px; }
+
+  .corpo-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .corpo-card{ background:var(--surface); border:1.5px solid var(--border); border-radius:14px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow); padding:0; font:inherit; color:var(--text); text-align:center; transition:border-color .15s, transform .1s; }
+  .corpo-card:active{ transform:scale(.97); }
+  .corpo-card.selected{ border-color:var(--primary); }
+  .corpo-card img{ display:block; width:100%; aspect-ratio:3/5; object-fit:cover; }
+  .corpo-card .lbl{ display:block; padding:8px 6px 10px; font-weight:800; font-size:12px; line-height:1.25; }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .grid2 .opt{ flex-direction:column; text-align:center; padding:20px 12px; gap:10px; }
+  .grid2 .opt-icon{ width:48px;height:48px; }
+
+  /* silhouettes row */
+  .silhouettes{ display:flex; align-items:flex-end; gap:6px; margin-bottom:18px; padding:14px 10px 10px; background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; }
+  .silhouettes.photos{ align-items:stretch; padding:10px; }
+  .sil-item{ flex:1 1 0; min-width:0; height:76px; display:flex; align-items:flex-end; justify-content:center; }
+  .sil-item svg{ height:100%; width:auto; max-width:100%; }
+  .sil-item.photo{ height:92px; border-radius:10px; overflow:hidden; }
+  .sil-item.photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .grid2 .opt-chev{ display:none; }
+
+  /* CTA */
+  .cta{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; padding:16px 20px; border-radius:14px; border:none;
+    background:var(--primary); color:#fff; font-weight:800; font-size:16px;
+    cursor:pointer; box-shadow:0 10px 24px -10px color-mix(in srgb, var(--primary) 70%, transparent);
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .cta:active{ transform:scale(.98); }
+  .cta.ghost{ background:transparent; color:var(--text-muted); box-shadow:none; font-weight:600; font-size:14px; padding:10px; }
+
+  /* intro hero */
+  .hero-photo{ position:relative; border-radius:22px; overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--border); margin-bottom:20px; }
+  .hero-photo img{ display:block; width:100%; height:auto; }
+  .hero-photos{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+  .hero-photos .hero-photo{ margin-bottom:0; aspect-ratio:3/4; }
+  .hero-photos .hero-photo img{ width:100%; height:100%; object-fit:cover; }
+  /* value stack */
+  .stack{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
+  .stack-item{ display:flex; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:var(--shadow); }
+  .stack-icon{ width:38px;height:38px;border-radius:10px;background:var(--primary-soft); display:flex;align-items:center;justify-content:center; font-size:18px; flex:none;}
+  .stack-old{ font-size:12px; color:var(--text-muted); text-decoration:line-through; display:block; }
+  .stack-new{ font-size:14px; font-weight:700; display:block; margin-top:1px;}
+
+  /* prova social */
+  .proof-card{ border-radius:18px; overflow:hidden; border:1px solid var(--border); box-shadow:var(--shadow); background:var(--surface); }
+  .proof-card img{ display:block; width:100%; height:auto; }
+  .proof-card .cap{ padding:11px 14px 14px; font-size:13px; color:var(--text-muted); text-align:center; }
+  .proof-card .cap b{ color:var(--text); }
+  .proof-track{ display:flex; overflow-x:auto; gap:16px; scroll-snap-type:x mandatory; margin:0 -20px 6px; padding:2px 20px 14px; }
+  .proof-track::-webkit-scrollbar{ height:6px; }
+  .proof-track::-webkit-scrollbar-thumb{ background:var(--border); border-radius:99px; }
+  .proof-slide{ flex:0 0 78%; scroll-snap-align:center; }
+  .proof-dots{ display:flex; justify-content:center; gap:6px; margin-bottom:20px; }
+  .proof-dots span{ width:6px;height:6px;border-radius:99px; background:var(--border); }
+  .proof-dots span.on{ background:var(--primary); width:16px; }
+
+  /* result screen */
+  .gauge-wrap{ display:flex; align-items:center; gap:18px; background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:18px; box-shadow:var(--shadow); margin-bottom:16px; }
+  .gauge{ position:relative; width:96px; height:96px; flex:none; }
+  .gauge svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .gauge-num{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:22px; }
+  .gauge-label b{ display:block; font-size:15px; margin-bottom:2px;}
+  .gauge-label span{ font-size:13px; color:var(--text-muted); }
+
+  .feature{ display:flex; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; box-shadow:var(--shadow); margin-bottom:10px; }
+  .feature .stack-icon{ background:var(--accent-soft); color:var(--accent); }
+  .feature b{ display:block; font-size:14.5px; margin-bottom:2px; }
+  .feature span{ font-size:13px; color:var(--text-muted); line-height:1.4; }
+
+  .plan-mock{ background:var(--surface-2); border:1px solid var(--border); border-radius:16px; padding:16px; margin:18px 0; }
+  .plan-mock .head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .plan-mock .head b{ font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:.02em; }
+  .plan-mock .tag{ background:var(--primary); color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase; }
+  .plan-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px dashed var(--border); font-size:13.5px; }
+  .plan-row:first-of-type{ border-top:none; }
+  .plan-row .muted{ color:var(--text-muted); font-size:12px; }
+
+  .offer-box{ background:var(--surface); border:2px solid var(--primary); border-radius:18px; padding:20px; text-align:center; box-shadow:var(--shadow); margin:20px 0 12px; }
+  .offer-box .from{ font-size:13px; color:var(--text-muted); text-decoration:line-through; }
+  .offer-box .to{ font-family:'Bebas Neue',sans-serif; font-size:44px; color:var(--primary-dark); line-height:1; }
+  :root:not([data-theme="light"]) .offer-box .to, :root[data-theme="dark"] .offer-box .to{ color:var(--primary); }
+  .offer-box .to sup{ font-size:18px; top:-.6em; }
+  .offer-box .note{ font-size:12.5px; color:var(--text-muted); margin-top:4px; }
+
+  /* loading (analisando perfil) */
+  .loading-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-height:64vh; gap:20px; padding:0 6px; }
+  .loading-spinner{ width:60px; height:60px; border-radius:50%; border:5px solid var(--surface-2); border-top-color:var(--primary); animation:spin 0.9s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .loading-spinner{ animation-duration:2.4s; } }
+  .loading-wrap h1.q{ margin:0; text-align:center; }
+  .loading-msg{ font-size:14.5px; color:var(--text-muted); min-height:20px; transition:opacity .2s ease; }
+  .loading-bar{ width:100%; max-width:240px; height:6px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--border); }
+  .loading-bar-fill{ height:100%; width:6%; background:linear-gradient(90deg,var(--primary-dark),var(--primary)); border-radius:999px; transition:width .5s cubic-bezier(.4,0,.2,1); }
+
+  /* oferta liberada (sem preço) */
+  .unlock-box{ background:var(--accent-soft); border:2px dashed var(--accent); border-radius:18px; padding:20px; text-align:center; box-shadow:var(--shadow); margin:20px 0 12px; }
+  .unlock-box .badge{ display:inline-flex; align-items:center; gap:6px; background:var(--accent); color:#fff; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:6px 12px; border-radius:999px; margin-bottom:12px; }
+  .unlock-box .headline{ font-family:'Bebas Neue',sans-serif; font-size:26px; line-height:1.18; letter-spacing:.005em; }
+  .unlock-box .note{ font-size:12.5px; color:var(--text-muted); margin-top:8px; }
+
+  .bonus-box{ background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:18px 20px 20px; box-shadow:var(--shadow); margin:6px 0 16px; }
+  .bonus-box h3{ font-family:'Bebas Neue',sans-serif; font-size:21px; margin:0 0 14px; text-align:center; letter-spacing:.02em; }
+  .bonus-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .bonus-list li{ display:flex; align-items:center; gap:12px; font-size:14px; line-height:1.35; }
+  .bonus-list .emoji{ font-size:19px; flex:none; width:28px; text-align:center; }
+
+  .icon-row{ display:flex; gap:8px; }
+  footer.legal{ text-align:center; font-size:11px; color:var(--text-muted); padding:6px 8px 30px; line-height:1.5; }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="step-count" id="stepCount"></div>
+  </div>
+  <main id="stepRoot"></main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  // CONFIGURAÇÃO — edite aqui antes de publicar o link definitivo
+  // ============================================================
+  var CONFIG = {
+    marca: "Desafio Atleta Híbrido",
+    preco: "19,90",                 // <-- troque pelo valor definido na Cakto
+    precoDe: "97,00",               // <-- valor "de" (âncora), opcional
+    linkCheckout: "https://pay.cakto.com.br/SEU-LINK-AQUI" // <-- troque pelo link de checkout da Cakto
+  };
+
+  var state = { step: 0, answers: {} };
+
+  function icon(name){
+    var s = {
+      run:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="15" cy="4.5" r="2" fill="currentColor"/><path d="M12 8l3 3 3-1M9 12l3-1 3 4-1 5M9 12l-3 2v4M9 12L7 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      dumbbell:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 9v6M2 10v4M7 6v12M17 6v12M20 10v4M22 9v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 12h10" stroke="currentColor" stroke-width="1.8"/></svg>',
+      fire:'🔥', muscle:'💪', strong:'🏋️', heart:'🫀',
+      person:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+      video:'🎥', check:'✅', wpp:'💬', star:'⭐', calendar:'📅', clock:'⏱️'
+    };
+    return s[name] || '';
+  }
+
+  function silhouette(scale, tone){
+    // gera um corpo simples cuja largura do tronco varia com "scale"
+    var w = 24 + scale*13;
+    var cx = 50;
+    return '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMax meet">' +
+      '<circle cx="'+cx+'" cy="18" r="11" fill="'+tone+'"/>' +
+      '<path d="M'+(cx-w/2)+' 92 C '+(cx-w/2-4)+' 55, '+(cx-w/2+2)+' 32, '+cx+' 30 C '+(cx+w/2-2)+' 32, '+(cx+w/2+4)+' 55, '+(cx+w/2)+' 92 Z" fill="'+tone+'"/>' +
+      '</svg>';
+  }
+
+  function optionHTML(o, i){
+    var iconHtml = o.img
+      ? '<span class="opt-icon"><img src="'+o.img+'" alt="" /></span>'
+      : o.num
+      ? '<span class="opt-icon num">'+o.num+'</span>'
+      : '<span class="opt-icon">'+(o.icon||'')+'</span>';
+    return '<button class="opt" data-i="'+i+'" type="button">' +
+      iconHtml +
+      '<span class="opt-text"><span class="opt-label">'+o.label+'</span>' +
+      (o.sub ? '<span class="opt-sub">'+o.sub+'</span>' : '') +
+      '</span>' +
+      '<span class="opt-chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+    '</button>';
+  }
+
+  function bindOptions(root, key, options, opts){
+    opts = opts || {};
+    var els = root.querySelectorAll('.opt');
+    els.forEach(function(el){
+      el.addEventListener('click', function(){
+        if (el.dataset.locked) return;
+        el.dataset.locked = "1";
+        el.classList.add('selected');
+        var val = options[+el.dataset.i].value;
+        state.answers[key] = val;
+        setTimeout(function(){ next(); }, opts.delay===0?0:220);
+      });
+    });
+  }
+
+  // ============================================================
+  // DEFINIÇÃO DOS PASSOS
+  // ============================================================
+  var STEPS = [];
+
+  // 0 — Intro
+  STEPS.push({
+    render: function(){
+      return '' +
+      '<div class="step">' +
+        '<span class="eyebrow">'+icon('fire')+' Desafio de 7 dias</span>' +
+        '<h1 class="q display" style="font-size:38px">Torne-se um<br><span style="color:var(--primary-dark)">Atleta Híbrido</span></h1>' +
+        '<p class="sub">Descubra o método que une corrida e musculação pra você ter um corpo estético, funcional e natural — sem abrir mão de nenhum dos dois.</p>' +
+        '<div class="hero-photos">' +
+          '<div class="hero-photo"><img src="img/hero-homem.jpg" alt="Resultado real do Desafio Atleta Híbrido" /></div>' +
+          '<div class="hero-photo"><img src="img/hero-mulher.jpg" alt="Resultado real do Desafio Atleta Híbrido" /></div>' +
+        '</div>' +
+        '<button class="cta" id="startBtn">Começar o desafio '+
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+        '<p class="sub" style="text-align:center;margin:14px 0 0;font-size:12.5px">Leva menos de 1 minuto. Sem compromisso.</p>' +
+      '</div>';
+    },
+    mount: function(root){
+      root.querySelector('#startBtn').addEventListener('click', next);
+    }
+  });
+
+  // 1 — Sexo
+  STEPS.push({
+    render: function(){
+      var options = [
+        {label:'Homem', img:'img/sexo-homem.jpg', value:'homem'},
+        {label:'Mulher', img:'img/sexo-mulher.jpg', value:'mulher'}
+      ];
+      this._opts = options;
+      return '<div class="step">' +
+        '<h1 class="q">Pra começar,<br>qual seu sexo?</h1>' +
+        '<p class="sub">Isso ajuda a calibrar o treino certo pra você.</p>' +
+        '<div class="sexo-grid">' + options.map(function(o,i){
+          return '<button class="sexo-card" data-i="'+i+'" type="button">' +
+            '<img src="'+o.img+'" alt="'+o.label+'" />' +
+            '<span class="lbl">'+o.label+'</span>' +
+          '</button>';
+        }).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){
+      var opts = this._opts;
+      root.querySelectorAll('.sexo-card').forEach(function(el){
+        el.addEventListener('click', function(){
+          if (el.dataset.locked) return;
+          el.dataset.locked = "1";
+          el.classList.add('selected');
+          state.answers.sexo = opts[+el.dataset.i].value;
+          setTimeout(next, 220);
+        });
+      });
+    }
+  });
+
+  // 2 — Físico atual
+  var FISICO_FOTOS_HOMEM = {
+    muito_magro: 'img/fisico-homem-muito-magro.jpg',
+    magro: 'img/fisico-homem-magro.jpg',
+    falso_magro: 'img/fisico-homem-falso-magro.jpg',
+    acima_peso: 'img/fisico-homem-acima-peso.jpg',
+    obeso: 'img/fisico-homem-obeso.jpg'
+  };
+  var FISICO_FOTOS_MULHER = {
+    muito_magro: 'img/fisico-mulher-muito-magro.jpg',
+    magro: 'img/fisico-mulher-magro.jpg',
+    falso_magro: 'img/fisico-mulher-falso-magro.jpg',
+    acima_peso: 'img/fisico-mulher-acima-peso.jpg',
+    obeso: 'img/fisico-mulher-obeso.jpg'
+  };
+
+  STEPS.push({
+    render: function(){
+      var sexo = state.answers.sexo;
+      var fotos = sexo === 'homem' ? FISICO_FOTOS_HOMEM : (sexo === 'mulher' ? FISICO_FOTOS_MULHER : null);
+      var options = [
+        {label:'Muito magro', sub:'Pouco músculo, corpo fino', icon:icon('person'), value:'muito_magro'},
+        {label:'Magro', sub:'Corpo fino, sem muita definição', icon:icon('person'), value:'magro'},
+        {label:'Falso magro', sub:'Magro por fora, sem definição', icon:icon('person'), value:'falso_magro'},
+        {label:'Acima do peso', sub:'Com gordura visível sobrando', icon:icon('person'), value:'acima_peso'},
+        {label:'Obeso', sub:'Bastante gordura acumulada', icon:icon('person'), value:'obeso'}
+      ];
+      if (fotos){
+        options.forEach(function(o){ o.img = fotos[o.value]; });
+      }
+      this._opts = options;
+      var bar;
+      if (fotos){
+        bar = '<div class="silhouettes photos">' + options.map(function(o){
+          return '<div class="sil-item photo"><img src="'+o.img+'" alt="'+o.label+'" /></div>';
+        }).join('') + '</div>';
+      } else {
+        bar = '<div class="silhouettes">' + [10,20,30,44,60].map(function(s){ return '<div class="sil-item">'+silhouette(s/12,'var(--border)')+'</div>'; }).join('') + '</div>';
+      }
+      return '<div class="step">' +
+        '<h1 class="q">Como está seu<br>físico hoje?</h1>' +
+        '<p class="sub">Seja sincero — é o ponto de partida do seu plano.</p>' +
+        bar +
+        '<div class="options">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){ bindOptions(root, 'fisico', this._opts); }
+  });
+
+  // 3 — Idade
+  STEPS.push({
+    render: function(){
+      var options = [
+        {label:'18–24 anos', icon:icon('person'), value:'18-24'},
+        {label:'25–34 anos', icon:icon('person'), value:'25-34'},
+        {label:'35–44 anos', icon:icon('person'), value:'35-44'},
+        {label:'45+ anos', icon:icon('person'), value:'45+'}
+      ];
+      this._opts = options;
+      return '<div class="step">' +
+        '<h1 class="q">Qual sua<br>faixa de idade?</h1>' +
+        '<p class="sub">O plano se ajusta à sua recuperação e intensidade ideal.</p>' +
+        '<div class="grid2">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){ bindOptions(root, 'idade', this._opts); }
+  });
+
+  // 4 — Objetivo principal
+  STEPS.push({
+    render: function(){
+      var options = [
+        {label:'Ganhar massa muscular', icon:icon('muscle'), value:'massa'},
+        {label:'Perder gordura e definir', icon:icon('fire'), value:'definicao'},
+        {label:'Melhorar o condicionamento', sub:'Correr mais e cansar menos', icon:icon('run'), value:'condicionamento'},
+        {label:'Ficar mais forte', icon:icon('strong'), value:'forca'}
+      ];
+      this._opts = options;
+      return '<div class="step">' +
+        '<h1 class="q">Qual seu objetivo<br>número 1 agora?</h1>' +
+        '<p class="sub">Escolha o que mais pesa pra você hoje.</p>' +
+        '<div class="options">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){ bindOptions(root, 'objetivo', this._opts); }
+  });
+
+  // 5 — Value stack / reveal
+  STEPS.push({
+    render: function(){
+      var items = [
+        {icon:icon('fire'), old:'Perder gordura', now:'Treinos de corrida + musculação pra queimar gordura sem perder força'},
+        {icon:icon('muscle'), old:'Ganhar definição', now:'Estímulo de hipertrofia direcionado pro seu tipo de corpo'},
+        {icon:icon('run'), old:'Correr melhor', now:'Progressão de corrida baseada na sua zona de frequência cardíaca'},
+        {icon:icon('video'), old:'Treinar sem errar', now:'Vídeo-aula de cada exercício, pra você nunca ficar na dúvida'}
+      ];
+      var options = [
+        {label:'Com certeza!', icon:'😍', value:'sim'},
+        {label:'Ainda não sei', icon:'😕', value:'talvez'}
+      ];
+      this._opts = options;
+      return '<div class="step">' +
+        '<h1 class="q">E se desse pra unir<br>tudo isso num método só?</h1>' +
+        '<div class="stack">' + items.map(function(it){
+          return '<div class="stack-item"><span class="stack-icon">'+it.icon+'</span>' +
+            '<span><span class="stack-old">'+it.old+'</span><span class="stack-new">'+it.now+'</span></span></div>';
+        }).join('') + '</div>' +
+        '<p class="sub" style="margin-bottom:14px"><b style="color:var(--text)">É isso que você tá buscando?</b></p>' +
+        '<div class="options">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){ bindOptions(root, 'quer_tudo', this._opts); }
+  });
+
+  // 6 — Corpo meta
+  var CORPO_META_FOTOS_HOMEM = {
+    bodybuilder: 'img/corpo-meta-homem-1.png',
+    corredor: 'img/corpo-meta-homem-2.png',
+    hibrido: 'img/corpo-meta-homem-3.png'
+  };
+  var CORPO_META_FOTOS_MULHER = {
+    bodybuilder: 'img/corpo-meta-mulher-1.png',
+    corredor: 'img/corpo-meta-mulher-2.png',
+    hibrido: 'img/corpo-meta-mulher-3.png'
+  };
+
+  STEPS.push({
+    render: function(){
+      var sexo = state.answers.sexo;
+      var fotos = sexo === 'homem' ? CORPO_META_FOTOS_HOMEM : (sexo === 'mulher' ? CORPO_META_FOTOS_MULHER : null);
+      var options = [
+        {num:'1', label:'Bodybuilder extremo', sub:'Enorme, mas cansa só de subir uma escada', value:'bodybuilder'},
+        {num:'2', label:'Corredor magro', sub:'Leve, mas sem massa muscular nenhuma', value:'corredor'},
+        {num:'3', label:'Atleta Híbrido', sub:'Forte, definido e com fôlego de sobra', value:'hibrido'}
+      ];
+      this._opts = options;
+      this._fotos = fotos;
+      if (fotos){
+        return '<div class="step">' +
+          '<h1 class="q">Qual desses é o<br>corpo que você quer?</h1>' +
+          '<div class="corpo-grid">' + options.map(function(o,i){
+            return '<button class="corpo-card" data-i="'+i+'" type="button">' +
+              '<img src="'+fotos[o.value]+'" alt="'+o.label+'" />' +
+              '<span class="lbl">'+o.label+'</span>' +
+            '</button>';
+          }).join('') + '</div>' +
+        '</div>';
+      }
+      return '<div class="step">' +
+        '<h1 class="q">Qual desses é o<br>corpo que você quer?</h1>' +
+        '<div class="options">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){
+      var opts = this._opts;
+      if (this._fotos){
+        root.querySelectorAll('.corpo-card').forEach(function(el){
+          el.addEventListener('click', function(){
+            if (el.dataset.locked) return;
+            el.dataset.locked = "1";
+            el.classList.add('selected');
+            state.answers.corpo_meta = opts[+el.dataset.i].value;
+            setTimeout(next, 220);
+          });
+        });
+      } else {
+        bindOptions(root, 'corpo_meta', opts);
+      }
+    }
+  });
+
+  // 7 — Medo / frustração
+  STEPS.push({
+    render: function(){
+      var options = [
+        {label:'Medo de perder massa muscular correndo', icon:'😰', value:'medo_perder_massa'},
+        {label:'Já tentei unir corrida e treino e travei', icon:'😑', value:'ja_travou'},
+        {label:'Falta um plano claro pra seguir', icon:'🤪', value:'sem_plano'},
+        {label:'Falta constância e motivação', icon:'😔', value:'sem_constancia'}
+      ];
+      this._opts = options;
+      return '<div class="step">' +
+        '<h1 class="q">Qual sua maior<br>trava hoje?</h1>' +
+        '<div class="options">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){ bindOptions(root, 'trava', this._opts); }
+  });
+
+  // 8 — Mito
+  STEPS.push({
+    render: function(){
+      var options = [
+        {label:'Sério? Quero aprender como!', icon:'😍', value:'quero'},
+        {label:'Já ouvi falar, mas nunca consegui', icon:'🧐', value:'ouvi_falar'},
+        {label:'Faz sentido!', icon:'🤓', value:'faz_sentido'}
+      ];
+      this._opts = options;
+      return '<div class="step">' +
+        '<h1 class="q">Você sabia que dá pra correr 40–50km por semana<br>e ainda ganhar massa muscular?</h1>' +
+        '<div class="options">' + options.map(optionHTML).join('') + '</div>' +
+      '</div>';
+    },
+    mount: function(root){ bindOptions(root, 'mito', this._opts); }
+  });
+
+  // 9 — Prova social
+  STEPS.push({
+    render: function(){
+      var slides = [
+        {src:'img/homem-1.jpg', who:'Aluno do Desafio Híbrido'},
+        {src:'img/mulher-1.jpg', who:'Aluna do Desafio Híbrido'},
+        {src:'img/homem-2.jpg', who:'Aluno do Desafio Híbrido'},
+        {src:'img/mulher-2.jpg', who:'Aluna do Desafio Híbrido'},
+        {src:'img/homem-3.jpg', who:'Aluno do Desafio Híbrido'},
+        {src:'img/mulher-3.jpg', who:'Aluna do Desafio Híbrido'},
+        {src:'img/homem-4.jpg', who:'Aluno do Desafio Híbrido'},
+        {src:'img/mulher-4.jpg', who:'Aluna do Desafio Híbrido'},
+        {src:'img/homem-5.jpg', who:'Aluno do Desafio Híbrido'},
+        {src:'img/mulher-5.jpg', who:'Aluna do Desafio Híbrido'}
+      ];
+      this._slides = slides;
+      return '<div class="step">' +
+        '<h1 class="q">Resultados reais de<br>quem já treina híbrido</h1>' +
+        '<p class="sub">Ninguém aqui tinha experiência prévia antes de começar.</p>' +
+        '<div class="proof-track" id="proofTrack">' + slides.map(function(s){
+          return '<div class="proof-slide">' +
+            '<div class="proof-card">' +
+              '<img src="'+s.src+'" alt="Antes e depois de '+s.who+' no Desafio Atleta Híbrido" />' +
+              '<div class="cap">Resultado real · <b>'+s.who+'</b></div>' +
+            '</div>' +
+          '</div>';
+        }).join('') + '</div>' +
+        '<div class="proof-dots" id="proofDots">' + slides.map(function(_,i){ return '<span class="'+(i===0?'on':'')+'"></span>'; }).join('') + '</div>' +
+        '<button class="cta" id="proofNext">Quero esse resultado</button>' +
+      '</div>';
+    },
+    mount: function(root){
+      var track = root.querySelector('#proofTrack');
+      var dots = root.querySelectorAll('#proofDots span');
+      track.addEventListener('scroll', function(){
+        var idx = Math.round(track.scrollLeft / (track.firstElementChild.offsetWidth + 16));
+        dots.forEach(function(d,i){ d.classList.toggle('on', i===idx); });
+      }, {passive:true});
+
+      var autoTimer = setInterval(function(){
+        if(!document.body.contains(track)){ clearInterval(autoTimer); return; }
+        var slideW = track.firstElementChild.offsetWidth + 16;
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        var nextLeft = track.scrollLeft + slideW;
+        if(nextLeft > maxScroll - 10){ nextLeft = 0; }
+        track.scrollTo({left:nextLeft, behavior:'smooth'});
+      }, 2600);
+      function pauseAuto(){ clearInterval(autoTimer); }
+      track.addEventListener('pointerdown', pauseAuto, {passive:true});
+      track.addEventListener('touchstart', pauseAuto, {passive:true});
+
+      root.querySelector('#proofNext').addEventListener('click', function(){
+        clearInterval(autoTimer);
+        next();
+      });
+    }
+  });
+
+  // 10 — Resultado / oferta
+  STEPS.push({
+    render: function(){
+      return '<div class="step">' +
+        '<div class="loading-wrap" id="loadingView">' +
+          '<div class="loading-spinner"></div>' +
+          '<h1 class="q">Analisando seu perfil...</h1>' +
+          '<p class="loading-msg" id="loadingMsg">Cruzando suas respostas com nosso banco de dados</p>' +
+          '<div class="loading-bar"><div class="loading-bar-fill" id="loadingFill"></div></div>' +
+        '</div>' +
+        '<div id="resultView" style="display:none">' +
+          '<span class="eyebrow">'+icon('check')+' Análise concluída</span>' +
+          '<h1 class="q">O Desafio Atleta Híbrido<br>é pra você</h1>' +
+          '<div class="gauge-wrap">' +
+            '<div class="gauge">' +
+              '<svg viewBox="0 0 100 100">' +
+                '<circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface-2)" stroke-width="10"/>' +
+                '<circle id="gaugeRing" cx="50" cy="50" r="42" fill="none" stroke="var(--primary)" stroke-width="10" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264"/>' +
+              '</svg>' +
+              '<div class="gauge-num mono" id="gaugeNum">0%</div>' +
+            '</div>' +
+            '<div class="gauge-label"><b>Alta compatibilidade</b><span>com o seu perfil e objetivo de treino</span></div>' +
+          '</div>' +
+          '<div class="feature"><span class="stack-icon">'+icon('wpp')+'</span><span><b>Direto no WhatsApp</b><span>Seu plano e acompanhamento chegam por lá, sem complicação</span></span></div>' +
+          '<div class="feature"><span class="stack-icon">'+icon('star')+'</span><span><b>Método testado</b><span>Usado por milhares de alunos que buscam um corpo híbrido</span></span></div>' +
+          '<div class="feature"><span class="stack-icon">'+icon('calendar')+'</span><span><b>Desafio de 7 dias</b><span>Em 1 semana você já sente diferença no espelho e no treino</span></span></div>' +
+          '<div class="plan-mock">' +
+            '<div class="head"><b>DIA 1</b><span class="tag">Híbrido</span></div>' +
+            '<div class="plan-row"><span>Corrida leve · aquecimento</span><span class="muted">30 min</span></div>' +
+            '<div class="plan-row"><span>Musculação · peitoral e abdômen</span><span class="muted">'+icon('video')+'</span></div>' +
+            '<div class="plan-row"><span>Mobilidade e alongamento</span><span class="muted">10 min</span></div>' +
+          '</div>' +
+          '<p class="sub" style="text-align:center;margin:0 0 6px">Quer receber seu plano de treino personalizado com vídeo-aula de cada exercício + acompanhamento no WhatsApp?</p>' +
+          '<div class="unlock-box">' +
+            '<span class="badge">🔓 Oferta liberada</span>' +
+            '<div class="headline">Acabamos de liberar uma oferta imperdível pra você</div>' +
+            '<div class="note">Vagas limitadas para o Desafio de 7 dias · acesso imediato</div>' +
+          '</div>' +
+          '<button class="cta" id="checkoutBtn">Receber minha oferta agora</button>' +
+          '<div class="bonus-box">' +
+            '<h3>Bônus</h3>' +
+            '<ul class="bonus-list">' +
+              '<li><span class="emoji">🏃</span><span>Guia de aquecimento para corrida</span></li>' +
+              '<li><span class="emoji">🏋️</span><span>Biblioteca de exercícios da musculação</span></li>' +
+              '<li><span class="emoji">📅</span><span>Calendário semanal de treino</span></li>' +
+              '<li><span class="emoji">📊</span><span>Planilha de acompanhamento de evolução</span></li>' +
+              '<li><span class="emoji">🥗</span><span>Guia básico de alimentação para acompanhar os treinos</span></li>' +
+              '<li><span class="emoji">🔥</span><span>Desafio de 30 dias para criar consistência</span></li>' +
+            '</ul>' +
+          '</div>' +
+          '<button class="cta" id="checkoutBtn2">Receber minha oferta agora</button>' +
+        '</div>' +
+      '</div>';
+    },
+    mount: function(root){
+      var loadingView = root.querySelector('#loadingView');
+      var resultView = root.querySelector('#resultView');
+      var msgEl = root.querySelector('#loadingMsg');
+      var fill = root.querySelector('#loadingFill');
+
+      function startGauge(){
+        var ring = root.querySelector('#gaugeRing');
+        var num = root.querySelector('#gaugeNum');
+        var target = 97, circumference = 264;
+        var start = null, duration = 900;
+        function frame(ts){
+          if(!start) start = ts;
+          var p = Math.min(1, (ts-start)/duration);
+          var val = Math.round(target*p);
+          num.textContent = val + '%';
+          ring.setAttribute('stroke-dashoffset', circumference - (circumference*val/100));
+          if(p<1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      var messages = [
+        'Cruzando suas respostas com nosso banco de dados',
+        'Calculando compatibilidade com seu objetivo',
+        'Liberando sua oferta exclusiva...'
+      ];
+      var step = 0;
+      fill.style.width = '15%';
+      var msgTimer = setInterval(function(){
+        step++;
+        if(step < messages.length){
+          msgEl.style.opacity = '0';
+          setTimeout(function(){
+            msgEl.textContent = messages[step];
+            msgEl.style.opacity = '1';
+          }, 180);
+          fill.style.width = (15 + step*40) + '%';
+        }
+      }, 700);
+
+      setTimeout(function(){
+        clearInterval(msgTimer);
+        fill.style.width = '100%';
+        setTimeout(function(){
+          loadingView.style.display = 'none';
+          resultView.style.display = 'block';
+          startGauge();
+        }, 250);
+      }, 2300);
+
+      function goCheckout(){
+        if (typeof fbq === 'function') { fbq('track', 'InitiateCheckout'); }
+        window.open(CONFIG.linkCheckout, '_blank', 'noopener');
+      }
+      root.querySelector('#checkoutBtn').addEventListener('click', goCheckout);
+      root.querySelector('#checkoutBtn2').addEventListener('click', goCheckout);
+    }
+  });
+
+  // ============================================================
+  // MOTOR DO QUIZ
+  // ============================================================
+  var root = document.getElementById('stepRoot');
+  var fill = document.getElementById('progressFill');
+  var count = document.getElementById('stepCount');
+
+  function render(){
+    var s = STEPS[state.step];
+    root.innerHTML = s.render.call(s);
+    if (s.mount) s.mount(root);
+    var pct = Math.round((state.step / (STEPS.length-1)) * 100);
+    fill.style.width = pct + '%';
+    count.textContent = state.step===0 ? '' : state.step + '/' + (STEPS.length-1);
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+  function next(){ if (state.step < STEPS.length-1){ state.step++; render(); } }
+
+  render();
+})();
+</script>
